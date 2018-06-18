@@ -1,22 +1,27 @@
+const alias = require('./alias');
+
 module.exports = {
-  "env": {
-    "mocha": true
+  parser: 'babel-eslint',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+      modules: true,
+    },
   },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
-    }
+  rules: {
+    indent: ['error', 2],
+    'class-methods-use-this': 0,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
-  "rules": {
-    "indent": ["error", 2],
-    "class-methods-use-this": 0
+  plugins: ['react', 'json'],
+  globals: {
+    document: true,
+    window: true,
   },
-  "plugins": [
-    "react"
-  ],
-  "extends": [
-    "airbnb-base",
-    "plugin:react/recommended"
-  ]
+  extends: ['airbnb-base', 'plugin:react/recommended'],
+  settings: {
+    'import/resolver': {
+      'babel-module': alias,
+    },
+  },
 };

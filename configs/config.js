@@ -1,11 +1,13 @@
+/*eslint-disable */
 export default {
   env: NODE_ENV,
+  versionHash: VERSION_HASH,
   paths: {
-    static: `/static/${VERSION_HASH}`,
-    styles: `/static/${VERSION_HASH}/styles`,
-    images: `/static/${VERSION_HASH}/images`,
+    static: `${ASSET_PREFIX}/static/${VERSION_HASH}`,
+    locales: `${ASSET_PREFIX}/static/${VERSION_HASH}/locales`,
   },
   api: {
     baseURL: API_BASE_URL,
   },
 };
+/* eslint-enable */

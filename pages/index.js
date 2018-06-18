@@ -1,57 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Link from 'next/link';
+import { bindActionCreators } from 'redux';
 
-import Error from './_error';
-import Layout from '../components/Layout';
-import Meta from '../components/Meta';
+import withPage from 'components/hoc/withPage';
+import Layout from 'components/layout/Layout';
+import Meta from 'components/layout/Meta';
+// import Error from 'components/common/Error';
+import Index from 'components/content/Index';
 
-import config from '../configs/config';
-import ApiClient from '../lib/api-client';
+import { showsFetchData } from '../redux/actions/shows';
 
-class Index extends React.Component {
-  static async getInitialProps() {
-    const apiClient = new ApiClient(config.api.baseURL);
-    const res = await apiClient.getShows('batman');
+class IndexPage extends React.Component {
+  static async getInitialProps({ store }) {
+    await store.dispatch(showsFetchData('batman'));
 
-    return res;
+    return {};
   }
 
   render() {
-    if (this.props.statusCode >= 400) {
-      return <Error statusCode={this.props.statusCode} />;
-    }
+    const { t, shows } = this.props;
 
-    return [
-      <Meta
-        key="0"
-        title="Batman Shows | Nextjs Template"
-        description="A comprehensive Nextjs template"
-      />,
-      <Layout key="1">
-        <div className="index">
-          <h1>Batman TV Programs</h1>
-          <ul>
-            {this.props.data ?
-              this.props.data.map(item =>
-                <li key={item.show.id}>
-                  <Link prefetch href={`/show?id=${item.show.id}`} as={`/shows/${item.show.id}`}>
-                    <a>{item.show.name} {item.show.rating.average ? `(${item.show.rating.average})` : ''}</a>
-                  </Link>
-                </li>)
-              :
-              ''
-            }
-          </ul>
-        </div>
-      </Layout>,
-    ];
+    return (
+      <Layout>
+        <Meta title={t('index:meta.title')} description={t('index:meta.description')} />
+        <Index shows={shows} />
+      </Layout>
+    );
   }
 }
 
-Index.propTypes = {
-  statusCode: PropTypes.number,
-  data: PropTypes.array,
+IndexPage.propTypes = {
+  isServer: PropTypes.bool,
+  showsFetchData: PropTypes.func,
+  shows: PropTypes.array,
+  t: PropTypes.func,
 };
 
-export default Index;
+const mapStateToProps = state => ({
+  shows: state.shows,
+  showsIsLoading: state.showsIsLoading,
+});
+
+const mapDispatchToProps = dispatch => ({
+  showsFetchData: bindActionCreators(showsFetchData, dispatch),
+});
+
+export default withPage(IndexPage, {
+  i18n: { namespaces: ['index'] },
+  redux: {
+    mapStateToProps,
+    mapDispatchToProps,
+  },
+});
+
+export const undecorated = IndexPage;

@@ -1,10 +1,12 @@
 import React from 'react';
-import Error from 'next/error';
+import PropTypes from 'prop-types';
 
-import Layout from '../components/Layout';
-import Meta from '../components/Meta';
+import withPage from 'components/hoc/withPage';
+import Layout from 'components/layout/Layout';
+import Meta from 'components/layout/Meta';
+import Error from 'components/common/Error';
 
-export default class MyError extends Error {
+class ErrorPage extends React.Component {
   static getInitialProps({ res, err }) {
     const { statusCode } = res || err;
 
@@ -12,19 +14,24 @@ export default class MyError extends Error {
   }
 
   render() {
-    return [
-      <Meta
-        key="0"
-        title="Error"
-        description="This is an error page"
-      />,
-      <Layout key="1">
-        <p>
-          {this.props.statusCode
-            ? `An error ${this.props.statusCode} occurred on server`
-            : 'An error occurred on client'}
-        </p>
-      </Layout>,
-    ];
+    const { t, statusCode } = this.props;
+
+    return (
+      <Layout>
+        <Meta title={t('index:meta.title')} description={t('index:meta.description')} />
+        <Error statusCode={statusCode} />
+      </Layout>
+    );
   }
 }
+
+ErrorPage.propTypes = {
+  t: PropTypes.func,
+  statusCode: PropTypes.number,
+};
+
+export default withPage(ErrorPage, {
+  i18n: { namespaces: ['common', 'error'] },
+});
+
+export const undecorated = ErrorPage;
